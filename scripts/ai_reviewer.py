@@ -56,6 +56,7 @@ def review_code(diff_content):
     1. Reject code with 'print()' statements (debugging leftovers).
     2. Reject code with missing docstrings/comments.
     3. Reject code with hardcoded secrets/passwords.
+    4. Reject code with profanity or unprofessional comments/prints.
     
     Output strictly in JSON format with these keys:
     - "status": "APPROVE" or "REJECT"
