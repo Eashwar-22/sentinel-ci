@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Sentinel-CI Technical Documentation</title>
+        <style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+                line-height: 1.6;
+                color: #24292e;
+                max-width: 900px;
+                margin: 0 auto;
+                padding: 40px 20px;
+                background-color: #ffffff;
+            }
+
+            h1 {
+                font-size: 2.5em;
+                border-bottom: 1px solid #eaecef;
+                padding-bottom: 0.3em;
+                margin-bottom: 24px;
+            }
+
+            h2 {
+                font-size: 1.75em;
+                border-bottom: 1px solid #eaecef;
+                padding-bottom: 0.3em;
+                margin-top: 48px;
+                margin-bottom: 16px;
+            }
+
+            h3 {
+                font-size: 1.25em;
+                margin-top: 32px;
+                margin-bottom: 16px;
+            }
+
+            p,
+            ul,
+            ol,
+            table,
+            pre {
+                margin-bottom: 16px;
+            }
+
+            ul,
+            ol {
+                padding-left: 2em;
+            }
+
+            li {
+                margin-bottom: 0.5em;
+            }
+
+            code {
+                padding: 0.2em 0.4em;
+                margin: 0;
+                font-size: 85%;
+                background-color: #f6f8fa;
+                border-radius: 6px;
+                font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+            }
+
+            pre {
+                padding: 16px;
+                overflow: auto;
+                font-size: 85%;
+                line-height: 1.45;
+                background-color: #f6f8fa;
+                border-radius: 6px;
+            }
+
+            pre code {
+                padding: 0;
+                background-color: transparent;
+            }
+
+            table {
+                border-collapse: collapse;
+                width: 100%;
+            }
+
+            th,
+            td {
+                padding: 8px 12px;
+                border: 1px solid #dfe2e5;
+            }
+
+            th {
+                background-color: #f6f8fa;
+                text-align: left;
+                font-weight: 600;
+            }
+
+            tr:nth-child(2n) {
+                background-color: #f8f9fa;
+            }
+
+            .alert {
+                padding: 16px;
+                margin-bottom: 16px;
+                border: 1px solid transparent;
+                border-radius: 6px;
+            }
+
+            .alert-info {
+                color: #24292e;
+                background-color: #dbedff;
+                border-color: rgba(4, 66, 137, 0.2);
+            }
+
+            .alert-warning {
+                color: #735c0f;
+                background-color: #fffbdd;
+                border-color: rgba(176, 163, 110, 0.2);
+            }
+
+            hr {
+                height: 1px;
+                margin: 40px 0;
+                background-color: #e1e4e8;
+                border: 0;
+            }
+
+            /* Directory Tree */
+            .tree {
+                font-family: monospace;
+                white-space: pre;
+                color: #0366d6;
+            }
+        </style>
+    </head>
+
+    <body>
+
+        <h1>Sentinel-CI Technical Documentation</h1>
+
+        <div class="alert alert-info">
+            <strong>GitHub Repository:</strong> <a
+                href="https://github.com/Eashwar-22/Sentinel-CI">https://github.com/Eashwar-22/Sentinel-CI</a>
+        </div>
+
+        <p>
+            Sentinel-CI is an advanced, automated Quality Gate system for software development.
+            It replaces traditional static analysis tools with a context-aware Large Language Model (LLM).
+            By integrating GitHub Actions with the Groq Cloud API, Sentinel-CI provides real-time,
+            intelligent code reviews on every Pull Request.
+        </p>
+
+        <div style="text-align: center; margin: 30px 0;">
+            <img src="assets/demo.gif" alt="Sentinel-CI Demo"
+                style="max-width: 100%; border-radius: 6px; border: 1px solid #dfe2e5;">
+            <p style="font-size: 0.9em; color: #586069; margin-top: 8px;"><em>Figure 1: Sentinel-CI blocking a PR in
+                    real-time.</em></p>
+        </div>
+
+        <h2>1. System Architecture</h2>
+
+        <p>The system is designed as a modular pipeline consisting of three primary components:</p>
+
+        <div style="text-align: center; margin: 30px 0;">
+            <img src="assets/architecture.png" alt="System Architecture"
+                style="max-width: 100%; border-radius: 6px; border: 1px solid #dfe2e5;">
+        </div>
+
+        <h3>1.1. The Trigger (CI Layer)</h3>
+        <p>
+            The process initiates within GitHub Actions. The workflow file
+            <code>.github/workflows/code_review.yaml</code>
+            subscribes to <code>pull_request</code> events targeting the <code>main</code> branch.
+        </p>
+        <ul>
+            <li><strong>Event Subscription:</strong> Listens for PR creation, synchronization, or reopening.</li>
+            <li><strong>Path Filtering:</strong> Configured to only trigger when <code>**/*.py</code> files are
+                modified, optimizing resource usage.</li>
+            <li><strong>Permissions:</strong> Requires <code>write-all</code> permissions to post comments back to the
+                PR.</li>
+        </ul>
+
+        <h3>1.2. The Logic Engine (Python Layer)</h3>
+        <p>
+            The core of the system is the <code>scripts/ai_reviewer.py</code> script. It performs the following
+            sequential operations:
+        </p>
+        <ol>
+            <li><strong>Diff Capture:</strong> Executes <code>git diff origin/main...HEAD</code> to extract the raw text
+                differences introduced by the PR.</li>
+            <li><strong>Prompt Engineering:</strong> Wraps the diff in a sophisticated system prompt that defines the
+                "Senior Reviewer" persona and specific validation rules.</li>
+            <li><strong>Inference:</strong> Transmits the payload to the Groq API (Llama-3-70b-versatile) via HTTPS.
+            </li>
+            <li><strong>Response Parsing:</strong> Decodes the returned JSON structure to extract the Status
+                (APPROVE/REJECT), Issue List, and the "Roast".</li>
+        </ol>
+
+        <h3>1.3. The Feedback Loop (CML Layer)</h3>
+        <p>
+            <strong>Continuous Machine Learning (CML)</strong> is used to bridge the gap between the CLI output and the
+            GitHub UI.
+            The system generates a markdown report (<code>review_report.md</code>) and uses
+            <code>cml comment create</code>
+            to post this directly onto the PR timeline.
+        </p>
+
+        <h2>2. Deep Dive: The Logic</h2>
+
+        <h3>2.1. The AI System Prompt</h3>
+        <p>
+            The reliability of Sentinel-CI comes from its strict system prompt.
+            The prompt explicitly instructs the LLM to output valid JSON and enforce specific heuristics.
+        </p>
+        <pre><code>You are a strict and humorous Senior Software Engineer code reviewer.
+Review the provided python code changes (git diff).
+
+Rules:
+1. Reject code with 'print()' statements (debugging leftovers).
+2. Reject code with missing docstrings/comments.
+3. Reject code with hardcoded secrets/passwords.
+4. Reject code with profanity or unprofessional comments.
+5. Reject wildcard imports (from module import *).
+6. Reject bare except clauses (except: passes silently).
+7. Reject TODO or FIXME comments.
+
+Output strictly in JSON format with these keys:
+- "status": "APPROVE" or "REJECT"
+- "issues": [list of string explanations]
+- "humorous_roast": A short, witty, sarcastic roast of the code.</code></pre>
+
+        <h3>2.2. Error Handling</h3>
+        <p>The system is resilient to failures:</p>
+        <ul>
+            <li><strong>API Failures:</strong> If the Groq API is unreachable, the script catches the exception and
+                returns a fallback JSON object with a generic rejection message ("API Error: Could not reach the
+                brain").</li>
+            <li><strong>JSON Parsing Errors:</strong> If the LLM returns malformed JSON, the system attempts to strip
+                markdown code blocks before parsing. If that fails, it defaults to a "REJECT" status.</li>
+        </ul>
+
+        <h2>3. Setup and Configuration</h2>
+
+        <h3>3.1. Environment Variables</h3>
+        <p>The application relies on secure environment variables injected at runtime:</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Variable</th>
+                    <th>Required</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>GROQ_API_KEY</code></td>
+                    <td>Yes</td>
+                    <td>Authentication key for the Groq Cloud API.</td>
+                </tr>
+                <tr>
+                    <td><code>GITHUB_TOKEN</code></td>
+                    <td>Yes</td>
+                    <td>Standard GitHub Actions token for repo access.</td>
+                </tr>
+                <tr>
+                    <td><code>REPO_TOKEN</code></td>
+                    <td>Yes</td>
+                    <td>Duplicate of GITHUB_TOKEN used specifically by CML.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>3.2. Installation Guide</h3>
+        <p>To deploy Sentinel-CI to your own repository:</p>
+        <ol>
+            <li><strong>Clone the Repository:</strong><br>
+                <code>git clone https://github.com/Eashwar-22/Sentinel-CI.git</code>
+            </li>
+            <li><strong>Configure Secrets:</strong><br>
+                Navigate to <code>Settings > Secrets/Actions</code> and add your <code>GROQ_API_KEY</code>.
+            </li>
+            <li><strong>Enable Actions:</strong><br>
+                Ensure GitHub Actions are enabled in the repository settings.
+            </li>
+        </ol>
+
+        <h2>4. Analytics Dashboard</h2>
+        <p>
+            Sentinel-CI persists review data to a local file <code>review_logs.jsonl</code>.
+            The accompanying dashboard (<code>dashboard.py</code>) visualizes this data.
+        </p>
+
+        <h3>4.1. Technology Stack</h3>
+        <div style="text-align: center; margin: 20px 0;">
+            <img src="assets/dashboard.png" alt="Streamlit Dashboard"
+                style="max-width: 100%; border-radius: 6px; border: 1px solid #dfe2e5;">
+        </div>
+        <ul>
+            <li><strong>Streamlit:</strong> For the web interface layout.</li>
+            <li><strong>Plotly Express:</strong> For interactive charts (Pie charts for pass rates, Bar charts for
+                violation types).</li>
+            <li><strong>Pandas:</strong> For data frame manipulation and log parsing.</li>
+        </ul>
+
+        <h3>4.2. Running Locally</h3>
+        <pre><code>pip install -r requirements.txt
+streamlit run dashboard.py</code></pre>
+
+        <h3>4.3. Data Structure</h3>
+        <p>Each log entry contains:</p>
+        <pre><code>{
+    "timestamp": "2023-10-27T10:00:00",
+    "status": "REJECT",
+    "roast": "This code is so untyped it hurts.",
+    "issues_count": 2
+}</code></pre>
+
+        <h2>5. Troubleshooting Guide</h2>
+
+        <div class="alert alert-warning">
+            <strong>Issue:</strong> "Build failed" but no comment appears.<br>
+            <strong>Fix:</strong> Check if the workflow has "Write" permissions. Go to Settings > Actions > General >
+            Workflow permisions and select "Read and write permissions".
+        </div>
+
+        <div class="alert alert-warning">
+            <strong>Issue:</strong> Script runs but returns 404 from API.<br>
+            <strong>Fix:</strong> Verify the `GROQ_API_KEY` is correct and has not expired. Ensure the model name
+            `llama-3.3-70b-versatile` is available on your tier.
+        </div>
+
+        <hr>
+        <p style="text-align: center; color: #586069;">
+            Sentinel-CI Documentation &bull; Eashwar-22 &bull; 2024
+        </p>
+
+    </body>
+
+</html>
