@@ -18,19 +18,7 @@ Functionality:
 
 ## Architecture
 
-```mermaid
-graph TD
-    User([Developer]) -->|Opens PR| GH[GitHub Actions]
-    GH -->|Git Diff| Script[AI Reviewer Script]
-    Script -->|Sends Code| Groq[Groq API (Llama 3)]
-    Groq -->|Verdict & Feedback| Script
-    Script -->|Post Comment| CML[CML Bot]
-    CML -->|Comment on PR| User
-    Script -- REJECT --> Block[Block Merge]
-    Script -- APPROVE --> Pass[Allow Merge]
-    Script -->|Log Result| DB[(review_logs.jsonl)]
-    DB -->|Read Data| Dash[Streamlit Dashboard]
-```
+![Architecture Diagram](architecture.png)
 
 ## Demo
 
