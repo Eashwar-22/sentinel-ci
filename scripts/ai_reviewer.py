@@ -5,6 +5,8 @@ import requests
 import sys
 from datetime import datetime
 
+print("oops")
+
 # Configuration
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
