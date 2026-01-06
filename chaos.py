@@ -1,7 +1,6 @@
 from datetime import *  # rule 5: wildcard import
 import os
 
-
 # rule 6: no docstrings
 
 def messy_function(x):
