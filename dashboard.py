@@ -12,7 +12,7 @@ st.set_page_config(
 )
 
 st.title("Sentinel-CI: AI Code Review Stats")
-st.markdown("### The Wall of Shame (and Fame)")
+st.markdown("### The Wall of Shame (& Fame)")
 
 # Load review logs
 LOG_FILE = "review_logs.jsonl"
@@ -57,7 +57,7 @@ with col1:
     st.plotly_chart(fig_pie, use_container_width=True)
 
 with col2:
-    st.subheader("Top Crimes (Violations)")
+    st.subheader("Top Violations")
     
     # We need to flatten the 'issues' list to count them
     # Handle cases where 'issues' might be missing or empty
@@ -80,7 +80,7 @@ with col2:
 
 # Roast History
 st.markdown("---")
-st.subheader("The Hall of Shame (Recent Roasts)")
+st.subheader("The Hall of Shame")
 
 # Show last 5 roasts
 log_display = df[['timestamp', 'status', 'roast']].tail(5).sort_values(by='timestamp', ascending=False)

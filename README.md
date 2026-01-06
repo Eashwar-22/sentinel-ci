@@ -27,6 +27,8 @@ Functionality:
 
 ## Dashboard
 
+![Dashboard Screenshot](assets/dashboard.png)
+
 The project includes a Streamlit dashboard to visualize review statistics and metrics.
 
 **Run the dashboard locally:**
