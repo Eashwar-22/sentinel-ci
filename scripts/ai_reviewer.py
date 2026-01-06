@@ -5,10 +5,11 @@ import requests
 import sys
 from datetime import datetime
 
+
 # Configuration
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
-MODEL = "llama3-8b-8192"
+MODEL = "llama-3.3-70b-versatile"
 
 if not GROQ_API_KEY:
     print("Error: GROQ_API_KEY is missing.")
@@ -53,6 +54,10 @@ def review_code(diff_content):
     1. Reject code with 'print()' statements (debugging leftovers).
     2. Reject code with missing docstrings/comments.
     3. Reject code with hardcoded secrets/passwords.
+    4. Reject code with profanity or unprofessional comments/prints.
+    5. Reject wildcard imports (from module import *).
+    6. Reject bare except clauses (except: passes silently).
+    7. Reject TODO or FIXME comments (finish the work before merging!).
     
     Output strictly in JSON format with these keys:
     - "status": "APPROVE" or "REJECT"
@@ -91,9 +96,18 @@ def main():
         print("No changes found.")
         sys.exit(0)
 
-    # Perform AI code review
+    # Step 2: Ask the AI Judge
     result_json_str = review_code(diff)
-    result_data = json.loads(result_json_str)
+   
+    # Clean up potential markdown backticks if the AI added them
+    clean_json_str = result_json_str.strip().replace("```json", "").replace("```", "")
+    
+    try:
+        result_data = json.loads(clean_json_str)
+    except json.JSONDecodeError:
+        print("Error: Could not parse JSON from AI response.")
+        # Fallback
+        result_data = {"status": "REJECT", "issues": ["AI Output Error"], "humorous_roast": "I'm speechless."}
     
     status = result_data.get("status", "REJECT")
     issues = result_data.get("issues", [])
@@ -117,9 +131,9 @@ def main():
 
     # Generate Markdown report for CML
     report_content = f"""
-# AI Code Review Report 🤖
+# AI Code Review Report
 
-**Verdict**: {status} {'✅' if status == 'APPROVE' else '❌'}
+**Verdict**: {status}
 
 > "{roast}"
 
