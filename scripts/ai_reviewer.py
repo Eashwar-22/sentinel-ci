@@ -67,7 +67,8 @@ def review_code(diff_content):
         "messages": [
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": f"Code Diff:\n{diff_content}"}
-        ]
+        ],
+        "response_format": {"type": "json_object"}
     }
 
     try:
@@ -94,9 +95,21 @@ def main():
         print("No changes found.")
         sys.exit(0)
 
-    # Perform AI code review
+    # Step 2: Ask the AI Judge
     result_json_str = review_code(diff)
-    result_data = json.loads(result_json_str)
+    
+    # Debug: Print what the AI actually sent back
+    print(f"Raw AI Response: {result_json_str}")
+
+    # Clean up potential markdown backticks if the AI added them
+    clean_json_str = result_json_str.strip().replace("```json", "").replace("```", "")
+    
+    try:
+        result_data = json.loads(clean_json_str)
+    except json.JSONDecodeError:
+        print("Error: Could not parse JSON from AI response.")
+        # Fallback
+        result_data = {"status": "REJECT", "issues": ["AI Output Error"], "humorous_roast": "I'm speechless."}
     
     status = result_data.get("status", "REJECT")
     issues = result_data.get("issues", [])
