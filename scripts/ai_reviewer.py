@@ -67,8 +67,7 @@ def review_code(diff_content):
         "messages": [
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": f"Code Diff:\n{diff_content}"}
-        ],
-        "response_format": {"type": "json_object"}
+        ]
     }
 
     try:
