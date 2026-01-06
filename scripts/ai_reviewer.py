@@ -5,8 +5,6 @@ import requests
 import sys
 from datetime import datetime
 
-print("oops")
-# FUCK AM I DOING
 
 # Configuration
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
@@ -57,6 +55,9 @@ def review_code(diff_content):
     2. Reject code with missing docstrings/comments.
     3. Reject code with hardcoded secrets/passwords.
     4. Reject code with profanity or unprofessional comments/prints.
+    5. Reject wildcard imports (from module import *).
+    6. Reject bare except clauses (except: passes silently).
+    7. Reject TODO or FIXME comments (finish the work before merging!).
     
     Output strictly in JSON format with these keys:
     - "status": "APPROVE" or "REJECT"
