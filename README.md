@@ -18,11 +18,11 @@ Functionality:
 
 ## Architecture
 
-![Architecture Diagram](architecture.png)
+![Architecture Diagram](assets/architecture.png)
 
 ## Demo
 
-![AI Review Demo](demo.gif)
+![AI Review Demo](assets/demo.gif)
 > *The AI detects issues in `chaos.py` and blocks the PR with a review comment.*
 
 ## Dashboard
