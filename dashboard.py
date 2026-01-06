@@ -6,12 +6,12 @@ import os
 
 # Page Configuration
 st.set_page_config(
-    page_title="The Gatekeeper Dashboard",
+    page_title="Sentinel-CI Dashboard",
     page_icon="🛡️",
     layout="wide"
 )
 
-st.title("🛡️ The Gatekeeper: AI Code Review Stats")
+st.title("🛡️ Sentinel-CI: AI Code Review Stats")
 st.markdown("### The Wall of Shame (and Fame)")
 
 # Load review logs

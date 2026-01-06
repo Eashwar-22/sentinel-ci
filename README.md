@@ -1,4 +1,4 @@
-# The Gatekeeper: AI-Powered Code Reviewer
+# Sentinel-CI: AI-Powered Code Reviewer
 
 **Automated Code Quality Gate using GitHub Actions and Groq API.**
 
@@ -8,7 +8,7 @@
 
 ## Overview
 
-The Gatekeeper is a CI/CD integration that automates code reviews for Pull Requests. It leverages the Groq API (Llama-3 model) to analyze code changes against a set of predefined quality assurance rules.
+Sentinel-CI is a CI/CD integration that automates code reviews for Pull Requests. It leverages the Groq API (Llama-3 model) to analyze code changes against a set of predefined quality assurance rules.
 
 Functionality:
 1.  **Analysis**: Scans git diffs for issues such as debug print statements, missing documentation, or security risks.
