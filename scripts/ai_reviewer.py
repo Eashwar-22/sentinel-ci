@@ -76,6 +76,8 @@ def review_code(diff_content):
         return response.json()['choices'][0]['message']['content']
     except Exception as e:
         print(f"Error calling Groq API: {e}")
+        if 'response' in locals():
+             print(f"Groq API Response Body: {response.text}")
         # Return a fallback JSON if API fails
         return json.dumps({
             "status": "REJECT", 
