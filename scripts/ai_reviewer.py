@@ -10,7 +10,7 @@ print("oops")
 # Configuration
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
-MODEL = "llama3-8b-8192"
+MODEL = "llama-3.3-70b-versatile"
 
 if not GROQ_API_KEY:
     print("Error: GROQ_API_KEY is missing.")
