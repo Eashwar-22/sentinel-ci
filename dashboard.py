@@ -7,11 +7,11 @@ import os
 # Page Configuration
 st.set_page_config(
     page_title="Sentinel-CI Dashboard",
-    page_icon="🛡️",
+    page_icon=None,
     layout="wide"
 )
 
-st.title("🛡️ Sentinel-CI: AI Code Review Stats")
+st.title("Sentinel-CI: AI Code Review Stats")
 st.markdown("### The Wall of Shame (and Fame)")
 
 # Load review logs
@@ -34,7 +34,7 @@ df = load_data()
 
 # Handle missing or empty data
 if df is None or df.empty:
-    st.warning("⚠️ No review logs found yet. Creating dummy data for demo...")
+    st.warning("No review logs found yet. Creating dummy data for demo...")
     # Generate dummy data for demonstration
     dummy_data = [
         {"status": "REJECT", "roast": "This code smells like burnt toast.", "issues": ["Print statement found"], "timestamp": "2023-10-01"},
@@ -80,7 +80,7 @@ with col2:
 
 # Roast History
 st.markdown("---")
-st.subheader("🔥 The Hall of Shame (Recent Roasts)")
+st.subheader("The Hall of Shame (Recent Roasts)")
 
 # Show last 5 roasts
 log_display = df[['timestamp', 'status', 'roast']].tail(5).sort_values(by='timestamp', ascending=False)

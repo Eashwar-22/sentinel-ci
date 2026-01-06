@@ -6,6 +6,7 @@ import sys
 from datetime import datetime
 
 print("oops")
+# FUCK AM I DOING
 
 # Configuration
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
@@ -77,8 +78,6 @@ def review_code(diff_content):
         return response.json()['choices'][0]['message']['content']
     except Exception as e:
         print(f"Error calling Groq API: {e}")
-        if 'response' in locals():
-             print(f"Groq API Response Body: {response.text}")
         # Return a fallback JSON if API fails
         return json.dumps({
             "status": "REJECT", 
@@ -97,10 +96,7 @@ def main():
 
     # Step 2: Ask the AI Judge
     result_json_str = review_code(diff)
-    
-    # Debug: Print what the AI actually sent back
-    print(f"Raw AI Response: {result_json_str}")
-
+   
     # Clean up potential markdown backticks if the AI added them
     clean_json_str = result_json_str.strip().replace("```json", "").replace("```", "")
     
@@ -133,9 +129,9 @@ def main():
 
     # Generate Markdown report for CML
     report_content = f"""
-# AI Code Review Report 🤖
+# AI Code Review Report
 
-**Verdict**: {status} {'✅' if status == 'APPROVE' else '❌'}
+**Verdict**: {status}
 
 > "{roast}"
 
