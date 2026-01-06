@@ -34,8 +34,8 @@ graph TD
 
 ## Demo
 
-> **[INSERT DEMO GIF HERE]**
-> *Instructions: Record a screen capture of opening a PR with non-compliant code (e.g., `print("debug")`), observing the Action failure, and viewing the bot's comment.*
+![AI Review Demo](demo.gif)
+> *The AI detects issues in `chaos.py` and blocks the PR with a review comment.*
 
 ## Dashboard
 
